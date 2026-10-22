@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Bibil TV | Vídeos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;700;800&family=Source+Sans+3:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0b0b0b;--surface:#141414;--line:#262626;--text:#ededed;--muted:#a1a1a1;--accent:#e11d2e;--accent-hi:#ff3b4a;color-scheme:dark;box-sizing:border-box;padding-bottom:env(safe-area-inset-bottom,0px)}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--bg);color:var(--text);font-family:"Source Sans 3",system-ui,sans-serif;font-size:17px;line-height:1.6}
+h1,h2,h3,.brand{font-family:Outfit,"Arial Black",sans-serif;margin:0}
+a{color:inherit;text-decoration:none}
+header{position:sticky;top:0;z-index:5;background:rgba(11,11,11,.82);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--line);padding-top:env(safe-area-inset-top,0px)}
+.bar{width:min(1240px,100% - 32px);margin-inline:auto;height:64px;display:flex;align-items:center;justify-content:space-between}
+.brand{font-weight:800;font-size:21px;display:flex;align-items:center;gap:10px}
+.brand svg{width:28px;height:28px}
+.back{color:var(--muted);font-size:15px;transition:color .2s}.back:hover{color:var(--text)}
+main{width:min(1240px,100% - 32px);margin:28px auto 64px;display:grid;gap:28px;grid-template-columns:1fr}
+@media(min-width:960px){main{grid-template-columns:minmax(0,1fr) 360px;align-items:start}}
+.stage{aspect-ratio:16/9;background:#000;border:1px solid var(--line);border-radius:16px;overflow:hidden;display:flex;align-items:center;justify-content:center}
+.stage video,.stage iframe{width:100%;height:100%;border:0;background:#000}
+.empty{color:var(--muted);padding:24px;text-align:center}
+.info{padding:22px 4px}
+.info h1{font-size:clamp(24px,3.4vw,34px);font-weight:800;line-height:1.15}
+.info p{color:var(--muted);margin:10px 0 0;max-width:46em}
+.side{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px}
+.side h2{font-size:18px;font-weight:700;margin-bottom:12px}
+.search{width:100%;height:46px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--text);padding:0 14px;font:inherit;margin-bottom:12px}
+.search:focus{outline:2px solid var(--accent-hi);outline-offset:1px}
+.list{display:grid;gap:8px;max-height:560px;overflow-y:auto}
+.item{display:grid;grid-template-columns:112px 1fr;gap:12px;align-items:center;text-align:left;width:100%;background:transparent;color:inherit;border:1px solid transparent;border-radius:12px;padding:8px;cursor:pointer;font:inherit;transition:background .2s,border-color .2s}
+.item:hover{background:#1b1b1b}
+.item.on{border-color:var(--accent);background:#1b1112}
+.thumb{aspect-ratio:16/9;border-radius:8px;background:linear-gradient(135deg,#2a0e12,#0b0b0b);position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center}
+.thumb img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.thumb svg{width:22px;height:22px;position:relative;filter:drop-shadow(0 1px 4px #000)}
+.item strong{font-family:Outfit,sans-serif;font-weight:700;font-size:15px;line-height:1.25;display:block}
+.item small{color:var(--muted);font-size:13px}
+.none{color:var(--muted);padding:10px 4px}
+</style>
+</head>
+<body>
+<header>
+  <div class="bar">
+    <a class="brand" href="https://bibilmodss.github.io/BIBIL-Tv/" aria-label="Bibil TV, página inicial">
+      <svg viewBox="0 0 140 150" aria-hidden="true"><path d="M50 30 L30 6 M90 30 L110 6" stroke="#e11d2e" stroke-width="9" stroke-linecap="round" fill="none"/><rect x="8" y="34" width="124" height="92" rx="22" fill="none" stroke="#e11d2e" stroke-width="11"/><polygon points="58,62 58,98 90,80" fill="#e11d2e" stroke="#e11d2e" stroke-width="6" stroke-linejoin="round"/></svg>
+      BIBIL TV
+    </a>
+    <a class="back" href="https://bibilmodss.github.io/BIBIL-Tv/">Voltar ao início</a>
+  </div>
+</header>
+
+<main>
+  <section aria-label="Player">
+    <div class="stage" id="stage"></div>
+    <div class="info">
+      <h1 id="title"></h1>
+      <p id="desc"></p>
+    </div>
+  </section>
+  <aside class="side" aria-label="Lista de vídeos">
+    <h2>Vídeos</h2>
+    <input class="search" id="q" type="search" placeholder="Buscar vídeo" aria-label="Buscar vídeo">
+    <div class="list" id="list"></div>
+  </aside>
+</main>
+
+<script>
+/* ============================================================
+   LISTA DE VÍDEOS - edite aqui para adicionar os seus.
+   Cada vídeo precisa de: id (sem espaços), title, desc e url.
+   A url pode ser:
+   - link do YouTube (youtube.com/watch?v=... ou youtu.be/...)
+   - link direto de vídeo (.mp4 ou .webm)
+   - link de transmissão ao vivo (.m3u8)
+   ============================================================ */
+var VIDEOS = [
+  {
+    id: "exemplo",
+    title: "Vídeo de exemplo",
+    desc: "Troque este item pelo seu primeiro vídeo editando a lista VIDEOS no arquivo videoview.html.",
+    url: "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4"
+  }
+  /* Modelo para adicionar mais (copie, cole depois de uma vírgula):
+  ,{
+    id: "meu-video-2",
+    title: "Título do vídeo",
+    desc: "Descrição curta.",
+    url: "https://www.youtube.com/watch?v=CODIGO"
+  }
+  */
+];
+
+(function(){
+  var stage=document.getElementById('stage'),listEl=document.getElementById('list'),
+      titleEl=document.getElementById('title'),descEl=document.getElementById('desc'),q=document.getElementById('q');
+  var cur=-1,hls=null;
+  var PLAY='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z" fill="#fff"/></svg>';
+
+  function ytId(u){var m=u.match(/(?:youtu\.be\/|v=|embed\/|shorts\/)([A-Za-z0-9_-]{11})/);return m?m[1]:null}
+  function kind(u){if(ytId(u))return'yt';if(/\.m3u8(\?|$)/i.test(u))return'hls';return'file'}
+
+  function clearStage(){if(hls){hls.destroy();hls=null}stage.innerHTML=''}
+
+  function play(i,auto){
+    var v=VIDEOS[i];if(!v)return;cur=i;clearStage();
+    titleEl.textContent=v.title;descEl.textContent=v.desc||'';document.title=v.title+' | Bibil TV';
+    try{history.replaceState(null,'','#'+v.id)}catch(e){}
+    var k=kind(v.url),el;
+    if(k==='yt'){
+      el=document.createElement('iframe');
+      el.src='https://www.youtube-nocookie.com/embed/'+ytId(v.url)+(auto?'?autoplay=1':'');
+      el.allow='accelerometer; autoplay; encrypted-media; picture-in-picture; fullscreen';
+      el.allowFullscreen=true;el.title=v.title;stage.appendChild(el);
+    }else{
+      el=document.createElement('video');el.controls=true;el.playsInline=true;el.preload='metadata';
+      el.addEventListener('ended',function(){if(cur+1<VIDEOS.length)play(cur+1,true)});
+      stage.appendChild(el);
+      if(k==='hls'&&!el.canPlayType('application/vnd.apple.mpegurl')){
+        var s=document.createElement('script');
+        s.src='https://cdnjs.cloudflare.com/ajax/libs/hls.js/1.5.13/hls.min.js';
+        s.onload=function(){if(window.Hls&&Hls.isSupported()){hls=new Hls();hls.loadSource(v.url);hls.attachMedia(el);if(auto)el.play()}};
+        document.head.appendChild(s);
+      }else{el.src=v.url;if(auto){var p=el.play();if(p&&p.catch)p.catch(function(){})}}
+    }
+    render();
+  }
+
+  function thumb(v){
+    var d=document.createElement('div');d.className='thumb';
+    var id=ytId(v.url);
+    if(id){var im=document.createElement('img');im.alt='';im.loading='lazy';im.src='https://i.ytimg.com/vi/'+id+'/mqdefault.jpg';d.appendChild(im)}
+    d.insertAdjacentHTML('beforeend',PLAY);return d;
+  }
+
+  function render(){
+    var t=q.value.trim().toLowerCase(),shown=0;listEl.innerHTML='';
+    VIDEOS.forEach(function(v,i){
+      if(t&&(v.title+' '+(v.desc||'')).toLowerCase().indexOf(t)<0)return;
+      shown++;
+      var b=document.createElement('button');b.type='button';b.className='item'+(i===cur?' on':'');
+      b.appendChild(thumb(v));
+      var w=document.createElement('div'),s=document.createElement('strong');s.textContent=v.title;w.appendChild(s);b.appendChild(w);
+      b.addEventListener('click',function(){play(i,true);window.scrollTo({top:0,behavior:'smooth'})});
+      listEl.appendChild(b);
+    });
+    if(!shown){var n=document.createElement('div');n.className='none';n.textContent='Nenhum vídeo encontrado.';listEl.appendChild(n)}
+  }
+
+  q.addEventListener('input',render);
+
+  if(!VIDEOS.length){stage.innerHTML='<div class="empty">Adicione vídeos na lista VIDEOS do arquivo.</div>';titleEl.textContent='Sem vídeos';return}
+  var h=location.hash.slice(1),start=0;
+  VIDEOS.forEach(function(v,i){if(v.id===h)start=i});
+  play(start,false);
+})();
+</script>
+</body>
+</html>
