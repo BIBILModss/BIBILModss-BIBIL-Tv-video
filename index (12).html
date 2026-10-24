@@ -1,0 +1,413 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BIBIL TV — Canais ao vivo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#050b1a; --bg2:#0a1630; --card:#0d1a33; --line:#1a2b4d;
+    --text:#eaf1ff; --muted:#8ea3c8; --accent:#2d7bff; --live:#ff3b4e; --ok:#27c27a;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{
+    background:radial-gradient(1200px 500px at 50% -10%, #0b2a6b55, transparent 70%), var(--bg);
+    color:var(--text); font-family:Inter,system-ui,sans-serif; min-height:100vh;
+  }
+  .wrap{max-width:1040px;margin:0 auto;padding:16px 20px 40px}
+  header{display:flex;align-items:center;justify-content:space-between;gap:12px}
+  .brand{display:flex;align-items:center;gap:10px;font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:.5px;cursor:pointer}
+  .brand .dot{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#2d7bff,#0a1f55);display:grid;place-items:center;font-size:12px}
+  .brand b{color:var(--accent);font-weight:400}
+  .pill{font-size:10px;font-weight:600;letter-spacing:.8px;padding:4px 9px;border-radius:99px;background:#ffffff10;display:flex;align-items:center;gap:6px}
+  .pill::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--live);animation:pulse 1.4s infinite}
+  @keyframes pulse{50%{opacity:.3}}
+  h1{font-family:'Bebas Neue',sans-serif;font-weight:400;font-size:clamp(40px,7vw,64px);line-height:.95;margin:28px 0 10px;letter-spacing:.5px}
+  h1 span{color:var(--accent)}
+  .sub{color:var(--muted);font-size:13px;margin:0 0 26px}
+  h2{font-family:'Bebas Neue',sans-serif;font-weight:400;font-size:20px;letter-spacing:.5px;margin:26px 0 12px;display:flex;align-items:center;gap:8px}
+  h2 .live-dot{width:7px;height:7px;border-radius:50%;background:var(--live)}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+  .events{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;cursor:pointer;transition:.15s;color:inherit;font:inherit;text-align:center;padding:0}
+  .card:hover,.card:focus-visible{border-color:var(--accent);transform:translateY(-2px);outline:none}
+  .cat{padding:12px 10px 10px}
+  .logo{height:62px;border-radius:8px;background:#ffffff08;display:grid;place-items:center;overflow:hidden;margin-bottom:10px}
+  .logo img{max-width:100%;max-height:100%;object-fit:contain}
+  .logo .fallback{font-weight:600;color:var(--muted);font-size:14px}
+  .name{font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:.4px}
+  .count{font-size:10px;color:var(--muted);margin-top:2px}
+  .ev-head{display:flex;justify-content:space-between;padding:6px 12px;font-size:10px;font-weight:600;letter-spacing:.6px;background:linear-gradient(90deg,#1f6bff,#2d9bff);border-radius:11px 11px 0 0}
+  .ev-body{display:flex;align-items:center;justify-content:space-around;padding:16px 8px;gap:6px}
+  .team{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;font-family:'Bebas Neue',sans-serif;font-size:14px}
+  .team .logo{width:52px;height:40px;margin:0;background:#ffffff10}
+  .vs{color:var(--muted);font-weight:600;font-size:12px}
+  .ev-foot{font-size:11px;color:var(--muted);padding:0 10px 10px}
+  .live-badge{color:var(--live);font-weight:600}
+  .back{background:none;border:1px solid var(--line);color:var(--text);padding:8px 14px;border-radius:99px;cursor:pointer;font:inherit;font-size:13px;margin-top:20px}
+  .back:hover{border-color:var(--accent)}
+  .chan{padding:12px 10px 10px;position:relative}
+  .chan .st{position:absolute;top:8px;right:8px;width:8px;height:8px;border-radius:50%;background:var(--ok)}
+  .chan.off .st{background:var(--live)}
+  .chan.off{opacity:.55}
+  .msg{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px;color:var(--muted);font-size:14px;line-height:1.5}
+  .msg.err{border-color:#ff3b4e66}
+  .msg code{background:#ffffff12;padding:1px 6px;border-radius:5px;color:var(--text)}
+  .spin{width:28px;height:28px;border:3px solid #ffffff22;border-top-color:var(--accent);border-radius:50%;animation:rot .8s linear infinite;margin:30px auto}
+  @keyframes rot{to{transform:rotate(360deg)}}
+  footer{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;border-top:1px solid var(--line);margin-top:44px;padding-top:20px}
+  footer a{font-size:12px;color:var(--text);background:#ffffff0d;padding:8px 14px;border-radius:99px;text-decoration:none}
+  footer a:hover{background:var(--accent)}
+  /* player */
+  #player{position:fixed;inset:0;background:#000d;backdrop-filter:blur(6px);display:none;z-index:50;align-items:center;justify-content:center;padding:12px}
+  #player.open{display:flex}
+  .pbox{width:min(1100px,100%);background:#000;border:1px solid var(--line);border-radius:14px;overflow:hidden;display:flex;flex-direction:column;max-height:100%}
+  .pbar{display:flex;align-items:center;gap:8px;padding:10px 12px;background:var(--bg2)}
+  .pbar .t{flex:1;font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .pbar button,.pbar a{background:#ffffff14;border:0;color:var(--text);padding:7px 11px;border-radius:8px;font:inherit;font-size:12px;cursor:pointer;text-decoration:none}
+  .pbar button:hover,.pbar a:hover{background:var(--accent)}
+  .stage{position:relative;aspect-ratio:16/9;background:#000;max-height:calc(100vh - 120px)}
+  .stage video,.stage iframe{position:absolute;inset:0;width:100%;height:100%;border:0;background:#000}
+  .stage .overlay{position:absolute;inset:0;display:grid;place-items:center;text-align:center;padding:20px;color:var(--muted);font-size:14px;line-height:1.5}
+  .stage .overlay strong{color:var(--text);display:block;margin-bottom:6px;font-size:16px}
+  .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--card);border:1px solid var(--line);padding:10px 16px;border-radius:99px;font-size:13px;z-index:80;display:none}
+  .toast.show{display:block}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand" id="home"><span class="dot">TV</span>BIBIL <b>TV</b></div>
+    <span class="pill">AO VIVO</span>
+  </header>
+
+  <div id="app"><div class="spin" aria-label="Carregando"></div></div>
+
+  <footer id="social"></footer>
+</div>
+
+<div id="player" role="dialog" aria-modal="true" aria-label="Player">
+  <div class="pbox">
+    <div class="pbar">
+      <span class="t" id="ptitle"></span>
+      <button id="pmode" title="Alternar entre vídeo direto e página incorporada">Trocar modo</button>
+      <a id="pnew" target="_blank" rel="noopener noreferrer">Abrir em nova aba</a>
+      <button id="preport">Reportar</button>
+      <button id="pfull">Tela cheia</button>
+      <button id="pclose" aria-label="Fechar">✕</button>
+    </div>
+    <div class="stage" id="stage"></div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/hls.js/1.5.17/hls.min.js"></script>
+<script>
+/* ============ CONFIGURAÇÃO ============ */
+const CONFIG = {
+  // Mesmo Firebase Realtime Database do app Android
+  DB_URL: "https://tv-bibil-livre-2023-default-rtdb.firebaseio.com",
+  // Opcional: proxy que adiciona CORS (ex.: um Cloudflare Worker seu). Use {url} onde entra o link codificado.
+  // Deixe vazio para não usar. Exemplo: "https://meu-proxy.workers.dev/?u={url}"
+  PROXY: "",
+  SOCIAL: [
+    ["WhatsApp", "https://wa.me/5561994346257"],
+    ["Telegram", "https://t.me/+vOSw9D2jbnAzODJh"],
+    ["Instagram", "https://www.instagram.com/eae_29_ss"],
+    ["Site", "https://bibiltv-2026.blogspot.com/"]
+  ]
+};
+
+/* ============ UTILITÁRIOS ============ */
+const $ = s => document.querySelector(s);
+const app = $("#app");
+function el(tag, props = {}, ...kids){
+  const n = document.createElement(tag);
+  for (const [k,v] of Object.entries(props)){
+    if (k === "class") n.className = v;
+    else if (k.startsWith("on")) n.addEventListener(k.slice(2), v);
+    else if (v !== undefined && v !== null) n.setAttribute(k, v);
+  }
+  for (const c of kids.flat()) if (c != null) n.append(c.nodeType ? c : document.createTextNode(c));
+  return n;
+}
+function toast(t){ const x=$("#toast"); x.textContent=t; x.classList.add("show"); clearTimeout(toast.t); toast.t=setTimeout(()=>x.classList.remove("show"),2800); }
+const isHttp = u => /^https?:\/\//i.test(u||"");
+
+async function dbGet(path){
+  const r = await fetch(`${CONFIG.DB_URL}/${path}.json`);
+  if (!r.ok){
+    const e = new Error(r.status === 401 || r.status === 403 ? "PERMISSION" : "HTTP " + r.status);
+    e.status = r.status; throw e;
+  }
+  const data = await r.json();
+  if (data == null) return [];
+  // Firebase devolve array (chaves 0,1,2…) ou objeto (chaves push-id)
+  const arr = Array.isArray(data) ? data.map((v,i)=>[String(i),v]) : Object.entries(data);
+  return arr.filter(([,v]) => v && typeof v === "object").map(([k,v]) => ({ _k:k, ...v }));
+}
+async function dbPush(path, body){
+  const r = await fetch(`${CONFIG.DB_URL}/${path}.json`, { method:"POST", body: JSON.stringify(body) });
+  if (!r.ok) throw new Error("HTTP " + r.status);
+}
+
+function logoBox(url, label){
+  const box = el("div", { class:"logo" });
+  const fb = () => { box.textContent = ""; box.append(el("span",{class:"fallback"}, (label||"?").trim().slice(0,2).toUpperCase())); };
+  if (isHttp(url)){
+    const img = el("img", { src:url, alt:label||"", loading:"lazy", referrerpolicy:"no-referrer" });
+    img.addEventListener("error", fb); box.append(img);
+  } else fb();
+  return box;
+}
+function showError(e){
+  app.textContent = "";
+  if (e && e.message === "PERMISSION"){
+    app.append(el("div",{class:"msg err"},
+      el("strong",{},"O banco de dados recusou a leitura."), el("br"),
+      "As regras do Firebase estão exigindo login. No console do Firebase, em ", el("code",{},"Realtime Database → Regras"),
+      ", libere a leitura dos nós usados pelo site (", el("code",{},"category"), ", ", el("code",{},"channels"), ", ", el("code",{},"LiveEvent"),
+      ") com ", el("code",{},'".read": true'), "."));
+  } else {
+    app.append(el("div",{class:"msg err"}, "Não consegui carregar os dados agora (" + (e && e.message || "erro de rede") + "). Verifique a conexão e tente de novo.",
+      el("br"), el("button",{class:"back",onclick:()=>start()},"Tentar de novo")));
+  }
+}
+
+/* ============ TELAS ============ */
+function viewHome(){
+  const cats = DB.category, chans = DB.channels, events = DB.LiveEvent;
+
+  const count = id => chans.filter(c => String(c.id) === String(id)).length;
+  app.textContent = "";
+  app.append(
+    el("h1",{}, "SUA TV ", el("span",{},"AO VIVO"), ",", el("br"), "EM QUALQUER TELA."),
+    el("p",{class:"sub"}, `${chans.length} canais em ${cats.length} categorias. Toque e assista.`)
+  );
+
+  if (events.length){
+    app.append(el("h2",{}, el("span",{class:"live-dot"}), "EVENTOS AO VIVO"));
+    const wrap = el("div",{class:"events"});
+    for (const ev of events){
+      const isLive = String(ev.schedule||"").toLowerCase() === "live" || String(ev.bottom||"").toLowerCase()==="live";
+      const b = el("button",{class:"card",type:"button",onclick:()=>openPlayer({ name: ev.name||`${ev.name1||""} x ${ev.name2||""}`, url: ev.url })},
+        el("div",{class:"ev-head"}, el("span",{}, (ev.name||"").toUpperCase()), el("span",{}, isLive ? "AO VIVO" : (ev.schedule||"").toUpperCase())),
+        el("div",{class:"ev-body"},
+          el("div",{class:"team"}, logoBox(ev.logo1, ev.name1), ev.name1||""),
+          el("span",{class:"vs"},"VS"),
+          el("div",{class:"team"}, logoBox(ev.logo2, ev.name2), ev.name2||"")),
+        ev.bottom && !isLive ? el("div",{class:"ev-foot"}, ev.bottom) : null,
+        isLive ? el("div",{class:"ev-foot live-badge"},"● Transmitindo agora") : null);
+      wrap.append(b);
+    }
+    app.append(wrap);
+  }
+
+  app.append(el("h2",{}, "CATEGORIAS"));
+  const grid = el("div",{class:"grid"});
+  for (const c of cats){
+    const n = count(c.id);
+    grid.append(el("button",{class:"card cat",type:"button",onclick:()=>{ location.hash = "#/categoria/" + encodeURIComponent(c.id); }},
+      logoBox(c.logo, c.name),
+      el("div",{class:"name"}, c.name||"Sem nome"),
+      el("div",{class:"count"}, n + (n===1?" canal":" canais"))));
+  }
+  app.append(grid);
+}
+
+function viewCategory(id){
+  const cats = DB.category, chans = DB.channels;
+  const cat = cats.find(c => String(c.id) === String(id));
+  const list = chans.filter(c => String(c.id) === String(id));
+  app.textContent = "";
+  app.append(
+    el("button",{class:"back",onclick:()=>{ location.hash = "#/"; }},"← Voltar"),
+    el("h1",{}, (cat && cat.name || "Canais").toUpperCase()),
+    el("p",{class:"sub"}, list.length + (list.length===1?" canal":" canais"))
+  );
+  if (!list.length){ app.append(el("div",{class:"msg"},"Nenhum canal nesta categoria por enquanto.")); return; }
+  const grid = el("div",{class:"grid"});
+  for (const ch of list){
+    const off = String(ch.Status).toLowerCase() === "false";
+    grid.append(el("button",{class:"card chan"+(off?" off":""),type:"button",
+        title: off ? "Marcado como fora do ar — pode não abrir" : "",
+        onclick:()=>openPlayer({ name: ch.name, url: ch.url, category: cat && cat.name, key: ch.key, logo: ch.logo })},
+      el("span",{class:"st"}),
+      logoBox(ch.logo, ch.name),
+      el("div",{class:"name"}, ch.name||"Canal")));
+  }
+  app.append(grid);
+}
+
+/* ---- dados em tempo real: o site acompanha o Firebase como o app ---- */
+const DB = { category:[], channels:[], LiveEvent:[] };
+let loaded = false;
+function render(keepScroll){
+  const y = window.scrollY;
+  const m = location.hash.match(/^#\/categoria\/(.+)$/);
+  m ? viewCategory(decodeURIComponent(m[1])) : viewHome();
+  if (keepScroll) window.scrollTo(0, y);
+}
+async function refresh(path, optional){
+  try {
+    const next = await dbGet(path);
+    if (JSON.stringify(next) === JSON.stringify(DB[path])) return false;
+    DB[path] = next; return true;
+  } catch(e){ if (!optional) throw e; return false; }
+}
+function watch(path){
+  let t, poll;
+  const onChange = () => { clearTimeout(t); t = setTimeout(async () => {
+    if (await refresh(path, true) && loaded) render(true);
+  }, 400); };
+  const startPoll = () => { if (!poll) poll = setInterval(onChange, 20000); };
+  if (!window.EventSource) return startPoll();
+  const es = new EventSource(`${CONFIG.DB_URL}/${path}.json`);
+  es.addEventListener("put", onChange);
+  es.addEventListener("patch", onChange);
+  es.addEventListener("cancel", () => { es.close(); startPoll(); });
+  es.onerror = () => startPoll(); // se o streaming falhar, consulta a cada 20s
+}
+async function start(){
+  app.textContent = ""; app.append(el("div",{class:"spin"}));
+  try {
+    await Promise.all([refresh("category"), refresh("channels")]);
+    await refresh("LiveEvent", true);
+  } catch(e){ return showError(e); }
+  loaded = true; render();
+  ["category","channels","LiveEvent"].forEach(watch);
+}
+function route(){
+  window.scrollTo(0,0);
+  loaded ? render() : start();
+}
+window.addEventListener("hashchange", route);
+$("#home").addEventListener("click", ()=>{ location.hash = "#/"; });
+
+/* ============ PLAYER ============ */
+const P = { cur:null, hls:null, mode:"auto" };
+
+function detectMode(url){
+  const u = (url||"").toLowerCase();
+  if (u.includes(".m3u8")) return "hls";
+  if (/\.(mp4|webm|ogv|m4v|mov)(\?|#|$)/.test(u)) return "video";
+  return "page";
+}
+function proxied(url){ return CONFIG.PROXY ? CONFIG.PROXY.replace("{url}", encodeURIComponent(url)) : url; }
+
+function cleanup(){
+  if (P.hls){ try{P.hls.destroy();}catch(_){} P.hls=null; }
+  $("#stage").textContent = "";
+}
+function overlay(title, text, actions){
+  const o = el("div",{class:"overlay"}, el("div",{}, el("strong",{},title), text, actions ? el("div",{style:"margin-top:12px"}, actions) : null));
+  $("#stage").append(o);
+}
+
+function openPlayer(item){
+  if (!item || !item.url){ toast("Este canal não tem link configurado."); return; }
+  P.cur = item; P.mode = detectMode(item.url);
+  $("#ptitle").textContent = item.name || "Canal";
+  const a = $("#pnew"); a.href = item.url;
+  $("#player").classList.add("open");
+  document.body.style.overflow = "hidden";
+  play();
+}
+function closePlayer(){
+  cleanup(); $("#player").classList.remove("open"); document.body.style.overflow = ""; P.cur = null;
+}
+
+function play(){
+  cleanup();
+  const { url } = P.cur;
+  const mixed = location.protocol === "https:" && /^http:\/\//i.test(url);
+  const stage = $("#stage");
+
+  if (P.mode === "page"){
+    if (mixed){
+      // Página http dentro de site https é bloqueada pelo navegador
+      return overlay("Link inseguro (http)", "O navegador bloqueia este link dentro de um site https. Abra em uma nova aba.",
+        el("a",{href:url,target:"_blank",rel:"noopener noreferrer",class:"back",style:"text-decoration:none;display:inline-block"},"Abrir em nova aba"));
+    }
+    const f = el("iframe",{ src:url, allow:"autoplay; fullscreen; encrypted-media; picture-in-picture", allowfullscreen:"",
+      referrerpolicy:"no-referrer", sandbox:"allow-scripts allow-same-origin allow-forms allow-presentation allow-popups" });
+    stage.append(f);
+    // iframes bloqueados por X-Frame-Options não geram evento de erro; deixamos o aviso sempre visível embaixo
+    const hint = el("div",{style:"position:absolute;left:0;right:0;bottom:0;padding:6px 10px;font-size:11px;color:#8ea3c8;background:#000a;pointer-events:none"},
+      "Se a tela ficar em branco, o site não permite ser incorporado: use “Abrir em nova aba” ou “Trocar modo”.");
+    stage.append(hint); setTimeout(()=>hint.remove(), 9000);
+    return;
+  }
+
+  const v = el("video",{ controls:"", autoplay:"", playsinline:"", preload:"auto" });
+  stage.append(v);
+  let src = url;
+  if (mixed) src = url.replace(/^http:/i, "https:"); // tenta a versão https do mesmo endereço
+  src = proxied(src);
+
+  const fail = (why) => {
+    cleanup();
+    const tips = [];
+    if (mixed) tips.push("O link é http e o site é https, então o navegador bloqueia.");
+    tips.push("Muitos servidores de transmissão só liberam acesso para apps (sem CORS), e o navegador não deixa um site ler esse vídeo.");
+    overlay("Não foi possível reproduzir aqui", tips.join(" "),
+      el("div",{style:"display:flex;gap:8px;justify-content:center;flex-wrap:wrap"},
+        el("button",{class:"back",style:"margin:0",onclick:()=>{ P.mode="page"; play(); }},"Tentar como página"),
+        el("a",{href:url,target:"_blank",rel:"noopener noreferrer",class:"back",style:"margin:0;text-decoration:none"},"Abrir em nova aba")));
+  };
+
+  if (P.mode === "hls"){
+    if (window.Hls && Hls.isSupported()){
+      const h = new Hls({ lowLatencyMode:true, maxBufferLength:20 });
+      P.hls = h;
+      h.on(Hls.Events.ERROR, (_, d) => {
+        if (!d.fatal) return;
+        if (d.type === Hls.ErrorTypes.NETWORK_ERROR && (P._retry = (P._retry||0)+1) <= 2){ h.startLoad(); return; }
+        if (d.type === Hls.ErrorTypes.MEDIA_ERROR){ h.recoverMediaError(); return; }
+        P._retry = 0; fail(d.details);
+      });
+      h.on(Hls.Events.MANIFEST_PARSED, () => { P._retry = 0; v.play().catch(()=>{}); });
+      h.loadSource(src); h.attachMedia(v);
+    } else if (v.canPlayType("application/vnd.apple.mpegurl")){ // Safari / iOS
+      v.src = src; v.addEventListener("error", () => fail("native"), { once:true });
+    } else fail("unsupported");
+  } else {
+    v.src = src; v.addEventListener("error", () => fail("video"), { once:true });
+    v.play().catch(()=>{});
+  }
+}
+
+$("#pclose").addEventListener("click", closePlayer);
+$("#player").addEventListener("click", e => { if (e.target.id === "player") closePlayer(); });
+document.addEventListener("keydown", e => { if (e.key === "Escape" && $("#player").classList.contains("open")) closePlayer(); });
+$("#pmode").addEventListener("click", () => {
+  if (!P.cur) return;
+  P.mode = P.mode === "page" ? (detectMode(P.cur.url) === "video" ? "video" : "hls") : "page";
+  play();
+});
+$("#pfull").addEventListener("click", () => {
+  const s = $("#stage");
+  (s.requestFullscreen || s.webkitRequestFullscreen || (()=>toast("Tela cheia indisponível"))).call(s);
+});
+$("#preport").addEventListener("click", async () => {
+  if (!P.cur) return;
+  const it = P.cur;
+  try {
+    await dbPush("Report_From_User", {
+      Category_Name: it.category || "", Channel_Name: it.name || "", Channel_Url: it.url || "",
+      Channel_Position_Key: it.key || "", Channel_Logo: it.logo || "", Status: "false", Source: "web"
+    });
+    toast("Relatório enviado. Obrigado!");
+  } catch(_){ toast("Não consegui enviar o relatório agora."); }
+});
+
+/* ============ INÍCIO ============ */
+const social = $("#social");
+for (const [t,u] of CONFIG.SOCIAL) social.append(el("a",{href:u,target:"_blank",rel:"noopener noreferrer"},t));
+route();
+</script>
+</body>
+</html>
